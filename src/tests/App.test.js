@@ -19,7 +19,7 @@ describe('App', () => {
   })
 
 
-  it('loads students from localStorage when the app starts', async () => {
+  it('loads students from localStorage and defaults missing status to Active', async () => {
     const students = [
       {
         id: 1,
@@ -41,11 +41,16 @@ describe('App', () => {
 
     await wrapper.vm.$nextTick()
 
-    expect(wrapper.vm.students).toEqual(students)
+    expect(wrapper.vm.students).toEqual([
+      {
+        ...students[0],
+        status: 'Active'
+      }
+    ])
   })
 
 
-  it('adds a new student and saves it to localStorage', async () => {
+  it('adds a new student and saves it to localStorage with Active status', async () => {
     const wrapper = mount(App)
 
     const newStudent = {
@@ -61,14 +66,22 @@ describe('App', () => {
       .vm.$emit('add-student', newStudent)
 
     expect(wrapper.vm.students).toHaveLength(1)
-    expect(wrapper.vm.students[0]).toMatchObject(newStudent)
+
+    expect(wrapper.vm.students[0]).toMatchObject({
+      ...newStudent,
+      status: 'Active'
+    })
 
     const saved = JSON.parse(
       localStorage.getItem('module7-student-records')
     )
 
     expect(saved).toHaveLength(1)
-    expect(saved[0]).toMatchObject(newStudent)
+
+    expect(saved[0]).toMatchObject({
+      ...newStudent,
+      status: 'Active'
+    })
   })
 
 
@@ -95,7 +108,8 @@ describe('App', () => {
     const updatedStudent = {
       ...existingStudent,
       firstName: 'Juan Updated',
-      course: 'BS Information Technology'
+      course: 'BS Information Technology',
+      status: 'Active'
     }
 
     await wrapper.findComponent({ name: 'StudentForm' })
@@ -111,7 +125,7 @@ describe('App', () => {
   })
 
 
-  it('starts editing a selected student', async () => {
+  it('starts editing a selected student and defaults missing status to Active', async () => {
     const student = {
       id: 1,
       studentId: '2023-00123',
@@ -127,7 +141,10 @@ describe('App', () => {
     await wrapper.findComponent({ name: 'StudentList' })
       .vm.$emit('edit-student', student)
 
-    expect(wrapper.vm.studentBeingEdited).toEqual(student)
+    expect(wrapper.vm.studentBeingEdited).toEqual({
+      ...student,
+      status: 'Active'
+    })
   })
 
 
@@ -200,7 +217,11 @@ describe('App', () => {
       .vm.$emit('delete-student', 1)
 
     expect(wrapper.vm.students).toHaveLength(1)
-    expect(wrapper.vm.students[0]).toEqual(student)
+
+    expect(wrapper.vm.students[0]).toEqual({
+      ...student,
+      status: 'Active'
+    })
   })
 
 
@@ -222,3 +243,4 @@ describe('App', () => {
   })
 
 })
+
