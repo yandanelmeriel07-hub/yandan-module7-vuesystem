@@ -1,4 +1,4 @@
-```vue
+
 <template>
   <div class="animate-in rounded-3xl p-6 mb-6 border shadow-glow
               bg-[var(--card)]/80 backdrop-blur-xl border-[var(--card-border)]">
@@ -79,6 +79,22 @@
           <option value="2">2nd Year</option>
           <option value="3">3rd Year</option>
           <option value="4">4th Year</option>
+        </select>
+      </div>
+
+      <!-- Status -->
+      <div>
+        <label class="block text-xs font-medium mb-1.5 text-[var(--text-muted)]">
+          Status
+        </label>
+        <select
+          v-model="form.status"
+          class="w-full rounded-xl px-3.5 py-2.5 border bg-[var(--bg)]/50 text-[var(--text)] text-sm
+                 border-[var(--card-border)] focus:outline-none focus:ring-2 focus:ring-[var(--violet)]/40
+                 focus:border-[var(--violet)] transition-all duration-200"
+        >
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
         </select>
       </div>
 
@@ -168,7 +184,8 @@ const emptyForm = {
   lastName: '',
   course: '',
   yearLevel: '1',
-  email: ''
+  email: '',
+  status: 'Active'
 }
 
 const form = ref({ ...emptyForm })
@@ -178,7 +195,10 @@ const successMessage = ref('')
 
 watch(() => props.editingStudent, (student) => {
   if (student) {
-    form.value = { ...student }
+    form.value = {
+      ...student,
+      status: student.status ?? 'Active'
+    }
     editingId.value = student.id
   }
 })
@@ -202,13 +222,15 @@ function handleSubmit() {
   if (editingId.value) {
     emit('update-student', {
       ...form.value,
-      id: editingId.value
+      id: editingId.value,
+      status: form.value.status || 'Active'
     })
 
     successMessage.value = 'Student updated successfully.'
   } else {
     emit('add-student', {
-      ...form.value
+      ...form.value,
+      status: form.value.status || 'Active'
     })
 
     successMessage.value = 'Student added successfully.'
@@ -240,4 +262,3 @@ function cancelEdit() {
   opacity: 0;
 }
 </style>
-```

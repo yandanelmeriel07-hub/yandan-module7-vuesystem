@@ -103,3 +103,7 @@ proposed future components.
 - No login authentication or user roles implemented yet
 - Future versions will connect to the PHP application layer and MySQL
   database proposed in Module 6, and add the Users table and login module
+
+  **Architecture Update – Module 9**
+
+The architecture remains based on the existing Vue.js and localStorage structure. The main evolution is the addition of Active/Inactive status handling and filtering. The StudentList component now provides the status filter, while the application logic handles status values and filtering. Existing CRUD, search, validation, delete confirmation, and localStorage persistence remain unchanged.

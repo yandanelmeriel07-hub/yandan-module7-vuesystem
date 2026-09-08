@@ -1,6 +1,10 @@
+
 <template>
   <div class="grain min-h-screen flex flex-col mesh-bg bg-[var(--bg)] transition-colors duration-300">
-    <AppHeader :is-dark="isDark" @toggle-theme="toggleTheme" />
+    <AppHeader
+      :is-dark="isDark"
+      @toggle-theme="toggleTheme"
+    />
 
     <main class="relative z-[1] flex-1 max-w-5xl mx-auto w-full px-5 py-8">
       <StudentForm
@@ -30,6 +34,7 @@ import AppFooter from './components/AppFooter.vue'
 
 const students = ref([])
 const studentBeingEdited = ref(null)
+
 const STORAGE_KEY = 'module7-student-records'
 const THEME_KEY = 'module7-theme'
 
@@ -37,7 +42,11 @@ const isDark = ref(false)
 
 function applyTheme() {
   document.documentElement.classList.toggle('dark', isDark.value)
-  localStorage.setItem(THEME_KEY, isDark.value ? 'dark' : 'light')
+
+  localStorage.setItem(
+    THEME_KEY,
+    isDark.value ? 'dark' : 'light'
+  )
 }
 
 function toggleTheme() {
@@ -47,39 +56,96 @@ function toggleTheme() {
 
 onMounted(() => {
   const savedTheme = localStorage.getItem(THEME_KEY)
-  isDark.value = savedTheme ? savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+
+  isDark.value = savedTheme
+    ? savedTheme === 'dark'
+    : window.matchMedia('(prefers-color-scheme: dark)').matches
+
   applyTheme()
 
   const saved = localStorage.getItem(STORAGE_KEY)
-  students.value = saved ? JSON.parse(saved) : []
+
+  if (saved) {
+    try {
+      const parsedStudents = JSON.parse(saved)
+
+      students.value = Array.isArray(parsedStudents)
+        ? parsedStudents.map(student => ({
+            ...student,
+
+            // Module 9:
+            // Older records without a status are Active by default.
+            status: student.status ?? 'Active'
+          }))
+        : []
+    } catch (error) {
+      console.error('Unable to load student records:', error)
+      students.value = []
+    }
+  } else {
+    students.value = []
+  }
 })
 
 function saveStudents() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(students.value))
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(students.value)
+  )
 }
 
 function addStudent(newStudent) {
-  students.value.push({ id: Date.now(), ...newStudent })
+  students.value.push({
+    id: Date.now(),
+    ...newStudent,
+
+    // New records are Active by default.
+    status: newStudent.status ?? 'Active'
+  })
+
   saveStudents()
 }
 
 function updateStudent(updatedStudent) {
-  const index = students.value.findIndex(s => s.id === updatedStudent.id)
+  const index = students.value.findIndex(
+    student => student.id === updatedStudent.id
+  )
+
   if (index !== -1) {
-    students.value[index] = updatedStudent
+    students.value[index] = {
+      ...updatedStudent,
+
+      // Preserve compatibility with records
+      // that do not yet have a status.
+      status: updatedStudent.status ?? 'Active'
+    }
+
     saveStudents()
   }
+
   studentBeingEdited.value = null
 }
 
 function deleteStudent(id) {
-  const confirmed = window.confirm('Are you sure you want to delete this student record?')
+  const confirmed = window.confirm(
+    'Are you sure you want to delete this student record?'
+  )
+
   if (!confirmed) return
-  students.value = students.value.filter(student => student.id !== id)
+
+  students.value = students.value.filter(
+    student => student.id !== id
+  )
+
   saveStudents()
 }
 
 function startEdit(student) {
-  studentBeingEdited.value = { ...student }
+  studentBeingEdited.value = {
+    ...student,
+
+    status: student.status ?? 'Active'
+  }
 }
 </script>
+
