@@ -1,0 +1,121 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --violet: #7c3aed;
+  --violet-soft: #8b5cf6;
+  --fuchsia: #c026d3;
+  --indigo: #4c1d95;
+  --bg: #f8f6fd;
+  --card: #ffffff;
+  --card-border: #e9e1fb;
+  --text: #241a3d;
+  --text-muted: #7a7192;
+  --danger: #dc2653;
+  --success: #16a34a;
+}
+
+.dark {
+  --violet: #a78bfa;
+  --violet-soft: #c4b5fd;
+  --fuchsia: #e879f9;
+  --indigo: #ddd6fe;
+  --bg: #0f0a1f;
+  --card: #1a1230;
+  --card-border: #322153;
+  --text: #f1edfb;
+  --text-muted: #a596c4;
+  --danger: #fb7185;
+  --success: #4ade80;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.font-brand { font-family: 'Outfit', sans-serif; }
+
+/* Mesh gradient background — soft, static-ish radial blobs, not a full animated linear sweep */
+.mesh-bg {
+  background-image:
+    radial-gradient(at 15% 10%, color-mix(in srgb, var(--violet) 20%, transparent) 0px, transparent 50%),
+    radial-gradient(at 85% 0%, color-mix(in srgb, var(--fuchsia) 16%, transparent) 0px, transparent 45%),
+    radial-gradient(at 90% 85%, color-mix(in srgb, var(--indigo) 18%, transparent) 0px, transparent 50%),
+    radial-gradient(at 10% 90%, color-mix(in srgb, var(--violet-soft) 14%, transparent) 0px, transparent 50%);
+}
+
+/* Subtle grain texture for depth */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--violet) 40%, transparent);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--violet); }
+
+/* Glow shadow utilities */
+.shadow-glow {
+  box-shadow: 0 8px 30px -8px color-mix(in srgb, var(--violet) 35%, transparent),
+              0 2px 8px -2px color-mix(in srgb, var(--indigo) 20%, transparent);
+}
+.shadow-glow-lg {
+  box-shadow: 0 20px 50px -12px color-mix(in srgb, var(--violet) 40%, transparent),
+              0 8px 20px -8px color-mix(in srgb, var(--fuchsia) 25%, transparent);
+}
+
+/* Button shine sweep */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.55s ease;
+}
+.btn-shine:hover::after { left: 130%; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeSlideIn 0.45s cubic-bezier(.22,1,.36,1) both; }
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-pop { animation: popIn 0.25s ease-out both; }
+
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-orbit { animation: orbit 8s linear infinite; }
+
+.list-enter-active, .list-leave-active { transition: all 0.3s cubic-bezier(.22,1,.36,1); }
+.list-enter-from { opacity: 0; transform: translateX(-14px) scale(0.98); }
+.list-leave-to { opacity: 0; transform: translateX(14px) scale(0.98); }
+.list-leave-active { position: absolute; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in, .animate-pop, .animate-orbit { animation: none !important; }
+  .btn-shine::after { display: none; }
+}
